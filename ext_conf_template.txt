@@ -1,0 +1,4 @@
+# cat=basic//; type=boolean; label=Enable logging when BE User is logged in only?
+enableBELogging = 0
+# cat=basic//; type=string; label=Enable logging for an IP Range - leave EMPTY when no IP Range should be used
+iprange = 0
