@@ -21,15 +21,15 @@
 *
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
-
-// get the fire_php core
-require_once (t3lib_extMgm::extPath('sms_firephp').'class.tx_smsfirephp.php');
  
+ 
+if(!class_exists('FirePHP'))
+{
+	require_once(t3lib_extMgm::extPath('fire_devlog').'lib/FirePHP.class.php');
+	require_once(t3lib_extMgm::extPath('fire_devlog').'lib/fb.php');
+}
 /**
- * Fire-Devlog
- * Logs the DevLog to the FirePHP Console
- * 
- * @author Erik Frister <efrister@web-factory.de>
+ * Fire-Devlog Hauptklasse
  */
 class tx_firedevlog
 {
