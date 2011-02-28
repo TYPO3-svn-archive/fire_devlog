@@ -23,37 +23,48 @@
 ***************************************************************/
  
  
-if(!class_exists('FirePHP'))
-{
+if (!class_exists('FirePHP')) {
 	require_once(t3lib_extMgm::extPath('fire_devlog').'lib/FirePHP.class.php');
 	require_once(t3lib_extMgm::extPath('fire_devlog').'lib/fb.php');
 }
+
 /**
- * Fire-Devlog Hauptklasse
+ * Fire-Devlog main class
+ *
+ * @package TYPO3
+ * @subpackage fire_devlog
  */
-class tx_firedevlog
-{
-	function devLog($logArr)
-	{
-		//Check the config
+class tx_firedevlog {
+
+	/**
+	 * Prepares log event
+	 * 
+	 * @param	array	$logArr: 
+	 * @return	void
+	 */
+	function devLog($logArr) {
+
+			// Check the config
 		$staticConf = unserialize ($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['fire_devlog']);
-		if (!is_array ($staticConf)) return;
-		$enableBELogging = $staticConf['enableBELogging'];
-		$iprange		 = $staticConf['iprange'];
-		
-		//Logging only if BE User is logged in?
-		if($enableBELogging && !$GLOBALS['BE_USER']->user)
-		return;
-		
-		//Logging only for an IP Range?
-		if('' != $iprange)
-		{
-			if(!t3lib_div::cmpIP(t3lib_div::getIndpEnv('REMOTE_ADDR'), trim($iprange)))
+		if (!is_array($staticConf)) {
 			return;
 		}
-		//return t3lib_div::cmpIP(t3lib_div::getIndpEnv('REMOTE_ADDR'), trim($value)) ? TRUE : FALSE;
+		$enableBELogging = $staticConf['enableBELogging'];
+		$ipRange = $staticConf['iprange'];
 		
-		//Holds the severity information
+			// Logging only if BE User is logged in?
+		if ($enableBELogging && !$GLOBALS['BE_USER']->user) {
+			return;
+		}
+
+			// Logging only for an IP Range?
+		if ('' != $ipRange) {
+			if (!t3lib_div::cmpIP(t3lib_div::getIndpEnv('REMOTE_ADDR'), trim($ipRange))) {
+				return;
+			}
+		}
+		
+			// Holds the severity information
 		$severity = array (
 			'0'  => FirePHP::LOG,
 			'1'  => FirePHP::INFO,
@@ -62,7 +73,7 @@ class tx_firedevlog
 			'-1' => FirePHP::INFO,
 		);	
 		
-		fb(date('d.m.Y H:i:s').' by '.$logArr['extKey'].': '.$logArr['msg'] ,$severity[$logArr['severity']]);
+		fb(date('d.m.Y H:i:s') . ' by ' . $logArr['extKey'] . ': ' . $logArr['msg'], $severity[$logArr['severity']]);
 		if (!empty($logArr['dataVar'])) {
 			fb($this->getPrintable ($logArr['dataVar']) . chr(10));
 		}
@@ -75,38 +86,40 @@ class tx_firedevlog
 	 * @param	integer	$spaces: Number of spaces to add before a line
 	 * @return	string	text output
 	 */
-	function getPrintable($var, $spaces=4) {
-		if ($spaces > 100) return;
+	function getPrintable($var, $spaces = 4) {
+		if ($spaces > 100) {
+			return;
+		}
 		$out = '';
 		if (is_array ($var)) {
 			foreach ($var as $k=>$v) {
 				if (is_array ($v)) {
-					$out .= str_repeat (' ',$spaces).$k.' => array ('.chr(10).$this->getPrintable($v, $spaces+3).str_repeat (' ',$spaces).')'.chr(10);
+					$out .= str_repeat(' ', $spaces) . $k . ' => array (' . LF . $this->getPrintable($v, $spaces + 3) . str_repeat (' ', $spaces) . ')' . LF;
 				} else {
 					if (is_object($v)) {
-						$out .= str_repeat (' ',$spaces).$k.' => object: '.get_class ($v).chr(10);
+						$out .= str_repeat(' ', $spaces) . $k . ' => object: ' . get_class($v) . LF;
 					} else {
-						$out .= str_repeat (' ',$spaces).$k.' => '.$v.chr(10);
+						$out .= str_repeat(' ', $spaces) . $k . ' => ' . $v . LF;
 					}
 				}
 			}
 			return $out;
 		} else {
 			if (is_object($var)) {
-				$out .= str_repeat (' ',$spaces).' [ OBJECT: '.strtoupper(get_class ($var)).' ]:'.chr(10);
-				if (is_array (get_object_vars ($var))) {
-					foreach (get_object_vars ($var) as $objVarName => $objVarValue) {
-						if (is_array ($objVarValue) || is_object ($objVarValue)) {
-							$out .= str_repeat (' ',$spaces). $objVarName . ' => '.chr(10);
-							$out .= $this->getPrintable ($objVarValue, $spaces+3);
+				$out .= str_repeat(' ', $spaces) . ' [ OBJECT: ' . strtoupper(get_class($var)) . ' ]:' . LF;
+				if (is_array(get_object_vars($var))) {
+					foreach (get_object_vars($var) as $objVarName => $objVarValue) {
+						if (is_array($objVarValue) || is_object($objVarValue)) {
+							$out .= str_repeat(' ', $spaces) . $objVarName . ' => ' . LF;
+							$out .= $this->getPrintable($objVarValue, $spaces + 3);
 						} else {
-							$out .= str_repeat (' ',$spaces). $objVarName . ' => ' .$objVarValue.chr(10);
+							$out .= str_repeat(' ', $spaces) . $objVarName . ' => ' .$objVarValue . LF;
 						}	
 					}	
 				}
-				$out .=chr(10);
+				$out .= LF;
 			} else {
-				$out .= str_repeat (' ',$spaces).'=> '.$var.chr(10);
+				$out .= str_repeat(' ', $spaces) . '=> ' . $var . LF;
 			}
 			return $out;
 		}
