@@ -44,24 +44,26 @@ class tx_firedevlog {
 	 */
 	function devLog($logArr) {
 
-			// Check the config
 		$staticConf = unserialize ($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['fire_devlog']);
+
+			// Check if there's a configuration
 		if (!is_array($staticConf)) {
 			return;
 		}
-		$enableBELogging = $staticConf['enableBELogging'];
-		$ipRange = $staticConf['iprange'];
-		
+			// Check if logging is enabled
+		if (!$staticConf['enableLogging']) {
+			return;
+		}
+
 			// Logging only if BE User is logged in?
-		if ($enableBELogging && !$GLOBALS['BE_USER']->user) {
+		if ($staticConf['enableBELogging'] && !$GLOBALS['BE_USER']->user) {
 			return;
 		}
 
 			// Logging only for an IP Range?
-		if ('' != $ipRange) {
-			if (!t3lib_div::cmpIP(t3lib_div::getIndpEnv('REMOTE_ADDR'), trim($ipRange))) {
-				return;
-			}
+		$ipRange = $staticConf['iprange'];
+		if ($ipRange != '' && !t3lib_div::cmpIP(t3lib_div::getIndpEnv('REMOTE_ADDR'), trim($ipRange))) {
+			return;
 		}
 		
 			// Holds the severity information
