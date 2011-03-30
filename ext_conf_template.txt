@@ -1,0 +1,6 @@
+# cat=basic//; type=boolean; label=Enable logging: WARNING: Turning on the logging without restricting the access by one of the below settings is dangerous. Debug messages will be visible for the public.
+enableLogging = 0
+# cat=basic//; type=boolean; label=Limit access to logged in BE users
+enableBELogging = 0
+# cat=basic//; type=string; label=Limit access to an IP Range (e.g. 192.168.1.*) - leave EMPTY when no IP Range should be used
+iprange =
